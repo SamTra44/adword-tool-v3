@@ -4,7 +4,7 @@ import requests as req
 import os, sqlite3, threading, time, uuid
 from datetime import datetime
 
-app = Flask(__name__, static_folder="static")
+app = Flask(__name__, static_folder=".")
 CORS(app)
 app.secret_key = os.environ.get("SECRET_KEY", "adword_v3_secret_x9k2m")
 
@@ -199,16 +199,16 @@ def admin_required(f):
 @app.route("/")
 def index():
     if not session.get("username"):
-        return send_from_directory("static", "login.html")
+        return send_from_directory(".", "login.html")
     if session.get("role") == "admin":
-        return send_from_directory("static", "admin.html")
-    return send_from_directory("static", "dashboard.html")
+        return send_from_directory(".", "admin.html")
+    return send_from_directory(".", "dashboard.html")
 
 @app.route("/dashboard")
 def dashboard():
     if not session.get("username"):
-        return send_from_directory("static", "login.html")
-    return send_from_directory("static", "dashboard.html")
+        return send_from_directory(".", "login.html")
+    return send_from_directory(".", "dashboard.html")
 
 # ── AUTH ROUTES ───────────────────────────────────────────
 @app.route("/login", methods=["POST"])
