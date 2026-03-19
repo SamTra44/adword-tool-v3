@@ -1,0 +1,265 @@
+<div id="scheduler-panel">
+
+<style>
+.sch-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.sch-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.sch-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.sch-form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.day-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.day-btn{padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);font-size:12px;cursor:pointer;font-weight:500;transition:all .15s}
+.day-btn.sel{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.sch-item{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px}
+.sch-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sch-item-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.sch-item-meta{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.sch-item-actions{display:flex;gap:6px;margin-top:8px}
+.btn-sm{font-size:11px;padding:4px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-weight:500}
+.btn-sm:hover{background:var(--color-background-secondary)}
+.btn-sm.danger{border-color:var(--color-border-danger);color:var(--color-text-danger)}
+.btn-sm.success{border-color:var(--color-border-success);color:var(--color-text-success)}
+.btn-sm.info{border-color:var(--color-border-info);color:var(--color-text-info)}
+.tog-on{background:var(--color-background-success);color:var(--color-text-success);border:none;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;cursor:pointer}
+.tog-off{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;cursor:pointer}
+.log-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.log-row:last-child{border-bottom:none}
+.log-status{padding:2px 8px;border-radius:var(--border-radius-md);font-size:10px;font-weight:500}
+.ls-running{background:var(--color-background-info);color:var(--color-text-info)}
+.ls-done{background:var(--color-background-success);color:var(--color-text-success)}
+.ls-no_live{background:var(--color-background-warning);color:var(--color-text-warning)}
+.ls-error{background:var(--color-background-danger);color:var(--color-text-danger)}
+.scrape-result{margin-top:8px;padding:8px 12px;border-radius:var(--border-radius-md);font-size:12px;display:none}
+.scrape-ok{background:var(--color-background-success);color:var(--color-text-success)}
+.scrape-fail{background:var(--color-background-warning);color:var(--color-text-warning)}
+.calc-preview{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:12px;color:var(--color-text-secondary);margin-bottom:10px}
+</style>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+
+<!-- Add Schedule Form -->
+<div class="sch-card">
+  <div class="sch-title">Add new schedule</div>
+
+  <div style="margin-bottom:8px">
+    <div class="lbl">Show name</div>
+    <input id="sch-name" placeholder="e.g. ShowBuzz"/>
+  </div>
+
+  <div style="margin-bottom:8px">
+    <div class="lbl">Facebook page URL</div>
+    <input id="sch-url" placeholder="https://www.facebook.com/pagename"/>
+    <button class="btn-sm info" style="margin-top:5px;width:100%" onclick="testScrape()">Test — check live now</button>
+    <div id="scrape-result" class="scrape-result"></div>
+  </div>
+
+  <div style="margin-bottom:8px">
+    <div class="lbl">Service</div>
+    <select id="sch-svc">
+      <option value="1554">🔥 #1554 — SV4 FB Live Stream Views | 90 Min</option>
+      <option value="1236">⚡ #1236 — Instant Start | 90 Min</option>
+    </select>
+  </div>
+
+  <div style="margin-bottom:8px">
+    <div class="lbl">Days</div>
+    <div class="day-btns">
+      <span class="day-btn" onclick="toggleDay(this,'Mon')">Mon</span>
+      <span class="day-btn" onclick="toggleDay(this,'Tue')">Tue</span>
+      <span class="day-btn" onclick="toggleDay(this,'Wed')">Wed</span>
+      <span class="day-btn" onclick="toggleDay(this,'Thu')">Thu</span>
+      <span class="day-btn" onclick="toggleDay(this,'Fri')">Fri</span>
+      <span class="day-btn" onclick="toggleDay(this,'Sat')">Sat</span>
+      <span class="day-btn" onclick="toggleDay(this,'Sun')">Sun</span>
+    </div>
+  </div>
+
+  <div class="sch-form-row">
+    <div>
+      <div class="lbl">Start time (IST)</div>
+      <input id="sch-time" type="time"/>
+    </div>
+    <div>
+      <div class="lbl">Total views</div>
+      <input id="sch-views" type="number" placeholder="2000" oninput="calcPreview()"/>
+    </div>
+  </div>
+
+  <div class="sch-form-row">
+    <div>
+      <div class="lbl">Orders count (max 10)</div>
+      <input id="sch-orders" type="number" value="4" min="1" max="10" oninput="calcPreview()"/>
+    </div>
+    <div>
+      <div class="lbl">Gap (minutes)</div>
+      <input id="sch-gap" type="number" value="3" min="1" oninput="calcPreview()"/>
+    </div>
+  </div>
+
+  <div class="calc-preview" id="calc-preview">Fill in views and orders to see preview</div>
+
+  <button class="btn-blue" style="width:100%" onclick="addSchedule()">+ Add Schedule</button>
+  <div style="font-size:12px;margin-top:6px;min-height:14px" id="sch-msg"></div>
+</div>
+
+<!-- Schedules List -->
+<div>
+  <div class="sch-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sch-title" style="margin-bottom:0">Active schedules</div>
+      <button class="btn-sm" onclick="loadSchedules()">Refresh</button>
+    </div>
+    <div id="schedules-list"><div style="font-size:12px;color:var(--color-text-secondary)">Loading...</div></div>
+  </div>
+
+  <div class="sch-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sch-title" style="margin-bottom:0">Recent run logs</div>
+      <button class="btn-sm" onclick="loadLogs()">Refresh</button>
+    </div>
+    <div id="scheduler-logs"><div style="font-size:12px;color:var(--color-text-secondary)">Loading...</div></div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+var selectedDays = [];
+
+function toggleDay(el, day){
+  if(selectedDays.includes(day)){
+    selectedDays = selectedDays.filter(d=>d!==day);
+    el.classList.remove('sel');
+  } else {
+    selectedDays.push(day);
+    el.classList.add('sel');
+  }
+}
+
+function calcPreview(){
+  var views = parseInt(document.getElementById('sch-views').value)||0;
+  var orders = parseInt(document.getElementById('sch-orders').value)||4;
+  var gap = parseInt(document.getElementById('sch-gap').value)||3;
+  if(views<1){ document.getElementById('calc-preview').textContent='Fill in views and orders to see preview'; return; }
+  orders = Math.min(10, Math.max(1,orders));
+  var qty = Math.ceil(views/orders);
+  var totalMins = (orders-1)*gap;
+  document.getElementById('calc-preview').textContent =
+    orders+' orders × '+qty.toLocaleString()+' views = '+views.toLocaleString()+' total | Completes in '+(orders-1)*gap+' min';
+}
+
+async function testScrape(){
+  var url = document.getElementById('sch-url').value.trim();
+  if(!url){ alert('Page URL daalo pehle!'); return; }
+  var el = document.getElementById('scrape-result');
+  el.style.display='block'; el.className='scrape-result';
+  el.textContent = 'Checking for live video...';
+  var r = await fetch('/scheduler/test-scrape',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_url:url})});
+  var d = await r.json();
+  if(d.success){
+    el.className='scrape-result scrape-ok';
+    el.textContent = 'Live found: '+d.live_link;
+  } else {
+    el.className='scrape-result scrape-fail';
+    el.textContent = 'No live video right now. Will check again at scheduled time.';
+  }
+}
+
+async function addSchedule(){
+  var name = document.getElementById('sch-name').value.trim();
+  var url  = document.getElementById('sch-url').value.trim();
+  var svc  = document.getElementById('sch-svc').value;
+  var time = document.getElementById('sch-time').value;
+  var views= parseInt(document.getElementById('sch-views').value)||0;
+  var ord  = parseInt(document.getElementById('sch-orders').value)||4;
+  var gap  = parseInt(document.getElementById('sch-gap').value)||3;
+  var msg  = document.getElementById('sch-msg');
+
+  if(!name||!url||!time||views<1||selectedDays.length===0){
+    msg.style.color='var(--color-text-danger)';
+    msg.textContent='Sab fields fill karo aur kam se kam ek din select karo!';
+    return;
+  }
+
+  var r = await fetch('/scheduler/add',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({show_name:name,page_url:url,service_id:svc,days:selectedDays,
+      start_time:time,total_views:views,orders_count:ord,gap_minutes:gap})});
+  var d = await r.json();
+  if(d.success){
+    msg.style.color='var(--color-text-success)';
+    msg.textContent='Schedule add ho gaya!';
+    document.getElementById('sch-name').value='';
+    document.getElementById('sch-views').value='';
+    selectedDays=[];
+    document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('sel'));
+    loadSchedules();
+  } else {
+    msg.style.color='var(--color-text-danger)';
+    msg.textContent=d.error||'Error!';
+  }
+}
+
+async function loadSchedules(){
+  var r = await fetch('/scheduler/list');
+  var list = await r.json();
+  var el = document.getElementById('schedules-list');
+  if(list.length===0){ el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Koi schedule nahi hai abhi.</div>'; return; }
+  var days_map={'Mon':'M','Tue':'T','Wed':'W','Thu':'Th','Fri':'F','Sat':'Sa','Sun':'Su'};
+  el.innerHTML = list.map(s=>{
+    var days = JSON.parse(s.days).map(d=>days_map[d]||d).join(' ');
+    var enabled = s.enabled===1;
+    return `<div class="sch-item">
+      <div class="sch-item-header">
+        <div class="sch-item-name">${s.show_name}</div>
+        <button class="${enabled?'tog-on':'tog-off'}" onclick="toggleSchedule(${s.id})">${enabled?'ON':'OFF'}</button>
+      </div>
+      <div class="sch-item-meta">
+        ${s.start_time} IST &nbsp;·&nbsp; ${days} &nbsp;·&nbsp;
+        ${s.orders_count} orders × ${s.qty_per_order.toLocaleString()} views &nbsp;·&nbsp;
+        ${s.gap_minutes}min gap
+      </div>
+      <div style="font-size:11px;color:var(--color-text-secondary)">#${s.service_id} &nbsp;·&nbsp; ${s.page_url.replace('https://www.facebook.com/','fb.com/')}</div>
+      <div class="sch-item-actions">
+        <button class="btn-sm success" onclick="runNow(${s.id})">Run now</button>
+        <button class="btn-sm danger" onclick="deleteSchedule(${s.id})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleSchedule(id){
+  await fetch('/scheduler/toggle/'+id,{method:'POST'});
+  loadSchedules();
+}
+
+async function deleteSchedule(id){
+  if(!confirm('Delete this schedule?')) return;
+  await fetch('/scheduler/delete/'+id,{method:'DELETE'});
+  loadSchedules();
+}
+
+async function runNow(id){
+  var r = await fetch('/scheduler/run-now/'+id,{method:'POST'});
+  var d = await r.json();
+  if(d.success){ alert('Started! Check logs.'); loadLogs(); }
+  else alert(d.error||'Error!');
+}
+
+async function loadLogs(){
+  var r = await fetch('/scheduler/logs');
+  var logs = await r.json();
+  var el = document.getElementById('scheduler-logs');
+  if(logs.length===0){ el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">Koi logs nahi hain.</div>'; return; }
+  el.innerHTML = logs.map(l=>`
+    <div class="log-row">
+      <span class="log-status ls-${l.status}">${l.status}</span>
+      <span style="color:var(--color-text-primary);font-weight:500">${l.show_name||'—'}</span>
+      <span style="color:var(--color-text-secondary)">${l.run_date}</span>
+      <span style="color:var(--color-text-success)">${l.orders_placed} orders</span>
+      <span style="font-size:11px;color:var(--color-text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis">${l.message||''}</span>
+    </div>`).join('');
+}
+
+loadSchedules();
+loadLogs();
+setInterval(loadLogs, 30000);
+</script>
