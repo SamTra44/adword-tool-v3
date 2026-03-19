@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AdWord Tool — Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#07090f;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:linear-gradient(135deg,#0f2027,#1a3a5c);padding:14px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e3a5c;flex-wrap:wrap;gap:8px}
+.topbar-title{color:#fff;font-size:15px;font-weight:700}
+.topbar-sub{color:#6b8caa;font-size:11px}
+.admin-badge{background:#1a1a0d;border:1px solid #b45309;color:#fbbf24;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.bal-badge{background:#0d1f35;border:1px solid #1a6ff5;color:#60a5fa;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px}
+.btn-logout{background:transparent;border:1px solid #ef444466;color:#ef4444;border-radius:6px;padding:4px 12px;font-size:10px;cursor:pointer;font-weight:600}
+.main{flex:1;padding:20px;max-width:900px;margin:0 auto;width:100%}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:#0e1117;border-radius:12px;padding:5px;border:1px solid #1e2a3a}
+.tab{flex:1;padding:9px;text-align:center;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#4a6fa5;transition:all .2s}
+.tab.active{background:#1a6ff5;color:white}
+.tab:hover:not(.active){background:#1e2d42;color:#c9d8eb}
+
+/* Panels */
+.panel{display:none}
+.panel.active{display:block}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#0e1117;border:1px solid #1e2a3a;border-radius:12px;padding:16px;text-align:center}
+.stat-val{font-size:28px;font-weight:700;color:#c9d8eb}
+.stat-val.g{color:#4ade80}.stat-val.b{color:#60a5fa}.stat-val.y{color:#fbbf24}
+.stat-lbl{font-size:10px;color:#4a6fa5;margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
+
+/* Cards */
+.card{background:#0e1117;border:1px solid #1e2a3a;border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:12px;color:#4a6fa5;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:14px}
+.field{margin-bottom:12px}
+.lbl{font-size:10px;color:#4a6fa5;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;display:block;font-weight:600}
+input{width:100%;background:#070c14;border:1px solid #1e2d42;border-radius:8px;padding:9px 12px;color:#c9d8eb;font-size:13px;outline:none;transition:border .2s}
+input:focus{border-color:#1a6ff5}
+input::placeholder{color:#1e3050}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-blue{background:#1a6ff5;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-blue:hover{background:#1558cc}
+.btn-green{background:#15803d;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-green:hover{background:#166534}
+.msg{font-size:12px;margin-top:8px;min-height:16px}
+.msg.ok{color:#4ade80}.msg.err{color:#f87171}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#070c14;color:#4a6fa5;padding:9px 10px;text-align:left;font-weight:600;border-bottom:1px solid #1e2d42;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid #0e1117;color:#c9d8eb}
+tr:hover td{background:#070c14}
+.badge-ok{background:#14532d;color:#4ade80;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600}
+.badge-fail{background:#450a0a;color:#f87171;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600}
+.badge-run{background:#1e3a5c;color:#60a5fa;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600}
+
+/* Export bar */
+.export-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.export-bar input[type=date]{width:auto;flex:1;min-width:130px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">⚡ AdWord Auto Order Tool</div>
+    <div class="topbar-sub">v3.0 — Admin Panel</div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="admin-badge">👑 ADMIN</div>
+    <div class="bal-badge">💰 $<span id="bal">0.00</span></div>
+    <div class="bal-badge" style="border-color:#1a6b3a;color:#4ade80">SMM $<span id="smm-bal">—</span></div>
+    <button class="btn-logout" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('overview')">📊 Overview</div>
+    <div class="tab" onclick="showTab('balance')">💰 Balance</div>
+    <div class="tab" onclick="showTab('orders')">📦 Orders</div>
+    <div class="tab" onclick="showTab('place')">▶ Place Order</div>
+  </div>
+
+  <!-- Overview -->
+  <div class="panel active" id="tab-overview">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val b" id="st-balance">$0</div><div class="stat-lbl">Current Balance</div></div>
+      <div class="stat-card"><div class="stat-val g" id="st-views">0</div><div class="stat-lbl">Total Views (All)</div></div>
+      <div class="stat-card"><div class="stat-val y" id="st-month-views">0</div><div class="stat-lbl">This Month Views</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-orders">0</div><div class="stat-lbl">Total Orders</div></div>
+      <div class="stat-card"><div class="stat-val g" id="st-success">0</div><div class="stat-lbl">Successful Orders</div></div>
+      <div class="stat-card"><div class="stat-val y" id="st-added">$0</div><div class="stat-lbl">Total Balance Added</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recent Orders</div>
+      <div class="tbl-wrap">
+        <table id="recent-tbl">
+          <thead><tr><th>#</th><th>Date</th><th>User</th><th>Service</th><th>Qty</th><th>Status</th><th>SMM ID</th></tr></thead>
+          <tbody id="recent-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Balance -->
+  <div class="panel" id="tab-balance">
+    <div class="card">
+      <div class="card-title">Add Balance</div>
+      <div class="row2">
+        <div class="field">
+          <span class="lbl">Transaction ID</span>
+          <input id="txn-id" placeholder="Enter transaction ID"/>
+        </div>
+        <div class="field">
+          <span class="lbl">Amount (USD)</span>
+          <input id="txn-amt" type="number" step="0.0001" placeholder="e.g. 10.00"/>
+        </div>
+      </div>
+      <button class="btn-green" onclick="addBalance()">✅ Add Balance</button>
+      <div class="msg" id="bal-msg"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Balance History</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Date</th><th>Transaction ID</th><th>Amount (USD)</th><th>Added By</th></tr></thead>
+          <tbody id="bal-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div class="panel" id="tab-orders">
+    <div class="card">
+      <div class="card-title">Export & Filter Orders</div>
+      <div class="export-bar">
+        <div>
+          <span class="lbl">From Date</span>
+          <input type="date" id="date-from"/>
+        </div>
+        <div>
+          <span class="lbl">To Date</span>
+          <input type="date" id="date-to"/>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn-blue" onclick="loadOrders()">🔍 Filter</button>
+          <button class="btn-green" onclick="exportExcel()">📥 Export Excel</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Date</th><th>User</th><th>Service</th><th>Link</th><th>Qty</th><th>Status</th><th>SMM ID</th></tr></thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Place Order (Admin can also place) -->
+  <div class="panel" id="tab-place">
+    <div class="card">
+      <div class="card-title">Place New Order</div>
+      <div class="field">
+        <span class="lbl">Service</span>
+        <select id="a-svc" style="width:100%;background:#070c14;border:1px solid #1e2d42;border-radius:8px;padding:9px 12px;color:#c9d8eb;font-size:13px;outline:none">
+          <option value="1554">🔥 #1554 — SV4 FB Live Stream Views | 90 Min</option>
+          <option value="1236">⚡ #1236 — FB Live Stream Views | 90 Min | Instant Start</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="lbl">Facebook Live Link</span>
+        <input id="a-link" placeholder="https://www.facebook.com/your-live-url"/>
+      </div>
+      <div class="row2">
+        <div class="field"><span class="lbl">Quantity per Order</span><input id="a-qty" type="number" value="100"/></div>
+        <div class="field"><span class="lbl">Total Orders</span><input id="a-total" type="number" value="5"/></div>
+      </div>
+      <div class="field"><span class="lbl">Gap (Minutes)</span><input id="a-gap" type="number" value="1"/></div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div class="sdot" id="a-sdot" style="width:8px;height:8px;border-radius:50%;background:#2a3a4a;flex-shrink:0"></div>
+        <span style="font-size:12px;color:#4a6fa5" id="a-status">Idle</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btn-blue" id="a-btn-s" onclick="adminStart()">▶ Start</button>
+        <button class="btn-blue" id="a-btn-x" onclick="adminStop()" disabled style="background:transparent;color:#ef4444;border:1.5px solid #ef4444">■ Stop</button>
+      </div>
+      <div style="margin-top:12px;background:#050810;border:1px solid #111d2e;border-radius:8px;padding:10px;height:120px;overflow-y:auto;font-family:monospace;font-size:11px" id="a-log">
+        <div style="color:#60a5fa">Ready.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let adminSid = null;
+let adminPoll = null;
+let adminLastOrder = 0;
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  if(name==='balance') loadBalanceHistory();
+  if(name==='orders') loadOrders();
+  if(name==='overview') loadStats();
+}
+
+async function loadMe(){
+  const r = await fetch('/me');
+  if(r.status===401){ window.location.href='/'; return; }
+  const d = await r.json();
+  document.getElementById('bal').textContent     = parseFloat(d.balance).toFixed(4);
+  document.getElementById('smm-bal').textContent = d.smm_balance ? parseFloat(d.smm_balance).toFixed(2) : '—';
+}
+
+async function loadStats(){
+  const r = await fetch('/admin/stats');
+  const d = await r.json();
+  document.getElementById('st-balance').textContent     = '$'+parseFloat(d.current_balance).toFixed(4);
+  document.getElementById('st-views').textContent       = d.total_views.toLocaleString();
+  document.getElementById('st-month-views').textContent = d.this_month_views.toLocaleString();
+  document.getElementById('st-orders').textContent      = d.total_orders;
+  document.getElementById('st-success').textContent     = d.success_orders;
+  document.getElementById('st-added').textContent       = '$'+parseFloat(d.balance_added).toFixed(4);
+
+  // Recent orders
+  const ro = await fetch('/admin/all-orders');
+  const orders = await ro.json();
+  const tbody = document.getElementById('recent-body');
+  tbody.innerHTML = orders.slice(0,15).map((o,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${o.created_at}</td>
+      <td>${o.username}</td>
+      <td>#${o.service_id}</td>
+      <td>${o.quantity}</td>
+      <td><span class="${o.status==='success'?'badge-ok':o.status==='running'?'badge-run':'badge-fail'}">${o.status}</span></td>
+      <td>${o.smm_order_id||'—'}</td>
+    </tr>`).join('');
+}
+
+async function addBalance(){
+  const txn = document.getElementById('txn-id').value.trim();
+  const amt = parseFloat(document.getElementById('txn-amt').value)||0;
+  const msg = document.getElementById('bal-msg');
+  if(!txn){ msg.className='msg err'; msg.textContent='Transaction ID required!'; return; }
+  if(amt<=0){ msg.className='msg err'; msg.textContent='Valid amount daalo!'; return; }
+  const r = await fetch('/admin/add-balance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({txn_id:txn,amount:amt})});
+  const d = await r.json();
+  if(d.success){
+    msg.className='msg ok';
+    msg.textContent=`✅ Balance added! New balance: $${parseFloat(d.new_balance).toFixed(4)}`;
+    document.getElementById('txn-id').value='';
+    document.getElementById('txn-amt').value='';
+    loadMe();
+    loadBalanceHistory();
+  } else {
+    msg.className='msg err';
+    msg.textContent='❌ '+d.error;
+  }
+}
+
+async function loadBalanceHistory(){
+  const r = await fetch('/admin/balance-history');
+  const logs = await r.json();
+  document.getElementById('bal-body').innerHTML = logs.map((l,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${l.created_at}</td>
+      <td><code style="color:#60a5fa;font-size:11px">${l.txn_id}</code></td>
+      <td style="color:#4ade80;font-weight:700">$${parseFloat(l.amount_usd).toFixed(4)}</td>
+      <td>${l.added_by}</td>
+    </tr>`).join('');
+}
+
+async function loadOrders(){
+  const from = document.getElementById('date-from').value;
+  const to   = document.getElementById('date-to').value;
+  let url = '/admin/all-orders';
+  if(from && to) url += `?from=${from}&to=${to}`;
+  const r = await fetch(url);
+  const orders = await r.json();
+  document.getElementById('orders-body').innerHTML = orders.map((o,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${o.created_at}</td>
+      <td>${o.username}</td>
+      <td>#${o.service_id}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.link}">${o.link}</td>
+      <td>${o.quantity}</td>
+      <td><span class="${o.status==='success'?'badge-ok':'badge-fail'}">${o.status}</span></td>
+      <td>${o.smm_order_id||'—'}</td>
+    </tr>`).join('');
+}
+
+function exportExcel(){
+  const from = document.getElementById('date-from').value;
+  const to   = document.getElementById('date-to').value;
+  let url = '/admin/export-excel';
+  if(from && to) url += `?from=${from}&to=${to}`;
+  window.location.href = url;
+}
+
+// Admin Place Order
+function alog(m,c='#1e3050'){
+  const b=document.getElementById('a-log');
+  const ts=new Date().toTimeString().slice(0,8);
+  b.innerHTML+=`<div style="color:${c};margin-bottom:2px">[${ts}] ${m}</div>`;
+  b.scrollTop=b.scrollHeight;
+}
+
+async function adminStart(){
+  const link=document.getElementById('a-link').value.trim();
+  const svc=document.getElementById('a-svc').value;
+  const qty=parseInt(document.getElementById('a-qty').value)||0;
+  const total=parseInt(document.getElementById('a-total').value)||0;
+  const gap=parseInt(document.getElementById('a-gap').value)||0;
+  if(!link||!link.includes('facebook.com')){alert('Valid Facebook link!');return}
+  document.getElementById('a-btn-s').disabled=true;
+  document.getElementById('a-btn-x').disabled=false;
+  document.getElementById('a-status').textContent='Starting...';
+  adminLastOrder=0;
+  const r=await fetch('/start-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({link,service_id:svc,quantity:qty,total_orders:total,gap_minutes:gap})});
+  const d=await r.json();
+  if(d.success){
+    adminSid=d.session_id;
+    alog(`Session started: ${adminSid.slice(0,8)}...`,'#60a5fa');
+    adminPoll=setInterval(adminPollStatus,3000);
+  } else {
+    alog('Error: '+d.error,'#f87171');
+    document.getElementById('a-btn-s').disabled=false;
+    document.getElementById('a-btn-x').disabled=true;
+  }
+}
+
+async function adminPollStatus(){
+  if(!adminSid) return;
+  const r=await fetch(`/session-status/${adminSid}`);
+  const d=await r.json();
+  if(d.error) return;
+  document.getElementById('a-status').textContent=`${d.placed}/${d.total} orders | ✅${d.success} ❌${d.failed}`;
+  if(d.orders){
+    d.orders.filter(o=>o.order_num>adminLastOrder).reverse().forEach(o=>{
+      if(o.status==='success') alog(`Order #${o.order_num} — ID: ${o.smm_order_id} ✓`,'#4ade80');
+      else alog(`Order #${o.order_num} — ${o.status}`,'#f87171');
+      adminLastOrder=Math.max(adminLastOrder,o.order_num);
+    });
+  }
+  if(d.status==='completed'||d.status==='stopped'){
+    clearInterval(adminPoll);
+    document.getElementById('a-btn-s').disabled=false;
+    document.getElementById('a-btn-x').disabled=true;
+    document.getElementById('a-status').textContent=d.status==='completed'?'✅ Complete!':'⏹ Stopped';
+    loadStats();
+  }
+}
+
+async function adminStop(){
+  if(!adminSid) return;
+  await fetch(`/stop-session/${adminSid}`,{method:'POST'});
+  alog('Stop signal bheja...','#fbbf24');
+}
+
+async function doLogout(){
+  await fetch('/logout',{method:'POST'});
+  window.location.href='/';
+}
+
+loadMe();
+loadStats();
+</script>
+</body>
+</html>

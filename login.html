@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AdWord Tool — Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#07090f;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:#0e1117;border:1px solid #1e2a3a;border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 12px 48px #000000aa;padding:36px 32px}
+.logo-row{text-align:center;margin-bottom:28px}
+.logo{width:52px;height:52px;background:linear-gradient(135deg,#1a6ff5,#0a3a8a);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px}
+.logo svg{width:28px;height:28px;fill:white}
+h1{color:#fff;font-size:20px;font-weight:700}
+.sub{color:#4a6fa5;font-size:12px;margin-top:4px}
+.field{margin-bottom:16px}
+.lbl{font-size:10px;color:#4a6fa5;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:block;font-weight:600}
+input{width:100%;background:#070c14;border:1px solid #1e2d42;border-radius:9px;padding:11px 14px;color:#c9d8eb;font-size:13px;outline:none;transition:border .2s}
+input:focus{border-color:#1a6ff5}
+input::placeholder{color:#1e3050}
+.btn{width:100%;background:#1a6ff5;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .15s}
+.btn:hover{background:#1558cc}
+.err{color:#ef4444;font-size:12px;text-align:center;margin-top:10px;min-height:18px}
+.footer{text-align:center;margin-top:20px;font-size:10px;color:#1a2a3a}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-row">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M3 3h18v2H3zm0 4h18v2H3zm0 4h12v2H3zm0 4h18v2H3zm0 4h12v2H3z"/></svg>
+    </div>
+    <h1>AdWord Auto Order Tool</h1>
+    <div class="sub">Version 3.0 — Please sign in</div>
+  </div>
+  <div class="field">
+    <span class="lbl">Username</span>
+    <input id="user" type="text" placeholder="Enter username" autocomplete="off"/>
+  </div>
+  <div class="field">
+    <span class="lbl">Password</span>
+    <input id="pass" type="password" placeholder="Enter password"/>
+  </div>
+  <button class="btn" onclick="doLogin()">Sign In →</button>
+  <div class="err" id="err"></div>
+  <div class="footer">AdWord Auto Order Tool 3.0</div>
+</div>
+<script>
+document.getElementById('pass').addEventListener('keydown', e => {
+  if(e.key === 'Enter') doLogin();
+});
+async function doLogin(){
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value.trim();
+  if(!u || !p){ document.getElementById('err').textContent = 'Please enter credentials'; return; }
+  const r = await fetch('/login', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({username:u, password:p})
+  });
+  const d = await r.json();
+  if(d.success){
+    window.location.href = '/';
+  } else {
+    document.getElementById('err').textContent = d.error || 'Login failed';
+  }
+}
+</script>
+</body>
+</html>
