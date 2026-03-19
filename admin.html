@@ -86,6 +86,7 @@ tr:hover td{background:#070c14}
     <div class="tab" onclick="showTab('balance')">💰 Balance</div>
     <div class="tab" onclick="showTab('orders')">📦 Orders</div>
     <div class="tab" onclick="showTab('place')">▶ Place Order</div>
+    <div class="tab" onclick="showTab('scheduler')">🤖 Scheduler</div>
   </div>
 
   <!-- Overview -->
@@ -132,7 +133,7 @@ tr:hover td{background:#070c14}
       <div class="card-title">Balance History</div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>#</th><th>Date</th><th>Transaction ID</th><th>Amount (USD)</th><th>Added By</th></tr></thead>
+          <thead><tr><th>#</th><th>Date</th><th>Transaction ID</th><th>Amount (USD)</th><th>Added By</th><th>Action</th></tr></thead>
           <tbody id="bal-body"></tbody>
         </table>
       </div>
@@ -164,6 +165,11 @@ tr:hover td{background:#070c14}
         </table>
       </div>
     </div>
+  </div>
+
+  <!-- Scheduler -->
+  <div class="panel" id="tab-scheduler">
+    <div id="scheduler-inject"></div>
   </div>
 
   <!-- Place Order (Admin can also place) -->
@@ -217,6 +223,14 @@ function showTab(name){
   if(name==='balance') loadBalanceHistory();
   if(name==='orders') loadOrders();
   if(name==='overview') loadStats();
+  if(name==='scheduler') loadSchedulerPanel();
+}
+
+async function loadSchedulerPanel(){
+  var el = document.getElementById('scheduler-inject');
+  if(el.children.length>0) return;
+  var r = await fetch('/scheduler.html');
+  el.innerHTML = await r.text();
 }
 
 async function loadMe(){
@@ -284,7 +298,19 @@ async function loadBalanceHistory(){
       <td><code style="color:#60a5fa;font-size:11px">${l.txn_id}</code></td>
       <td style="color:#4ade80;font-weight:700">$${parseFloat(l.amount_usd).toFixed(4)}</td>
       <td>${l.added_by}</td>
+      <td><button onclick="deleteBalance(${l.id})" style="background:#450a0a;color:#f87171;border:1px solid #7f1d1d;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600">🗑 Delete</button></td>
     </tr>`).join('');
+}
+
+async function deleteBalance(id){
+  if(!confirm('Yeh balance entry delete karna chahte ho?')) return;
+  const r = await fetch(`/admin/delete-balance/${id}`, {method:'DELETE'});
+  const d = await r.json();
+  if(d.success){
+    document.getElementById('bal').textContent = parseFloat(d.new_balance).toFixed(4);
+    loadBalanceHistory();
+    loadStats();
+  }
 }
 
 async function loadOrders(){
