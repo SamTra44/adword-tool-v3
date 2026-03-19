@@ -7,51 +7,68 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#07090f;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column}
-.topbar{background:linear-gradient(135deg,#0f2027,#1a3a5c);padding:14px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e3a5c}
+.topbar{background:linear-gradient(135deg,#0f2027,#1a3a5c);padding:14px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e3a5c;flex-wrap:wrap}
 .topbar-title{color:#fff;font-size:15px;font-weight:700}
 .topbar-sub{color:#6b8caa;font-size:11px}
-.badge{background:#12261a;border:1px solid #1a6b3a;color:#4ade80;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.live-badge{background:#12261a;border:1px solid #1a6b3a;color:#4ade80;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
 .dot-live{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:blink 1.2s infinite}
 .bal-badge{background:#0d1f35;border:1px solid #1a6ff5;color:#60a5fa;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px}
 .btn-logout{background:transparent;border:1px solid #ef444466;color:#ef4444;border-radius:6px;padding:4px 12px;font-size:10px;cursor:pointer;font-weight:600}
-.main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px}
-.card{background:#0e1117;border:1px solid #1e2a3a;border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 8px 32px #00000088}
-.body{padding:22px}
-.field{margin-bottom:14px}
-.lbl{font-size:10px;color:#4a6fa5;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;display:block;font-weight:600}
-input,select{width:100%;background:#070c14;border:1px solid #1e2d42;border-radius:9px;padding:10px 13px;color:#c9d8eb;font-size:13px;outline:none;transition:border .2s}
+.main{flex:1;padding:16px;max-width:860px;margin:0 auto;width:100%}
+.tabs{display:flex;gap:4px;margin-bottom:18px;background:#0e1117;border-radius:12px;padding:5px;border:1px solid #1e2a3a}
+.tab{flex:1;padding:9px;text-align:center;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#4a6fa5;transition:all .2s}
+.tab.active{background:#1a6ff5;color:white}
+.tab:hover:not(.active){background:#1e2d42;color:#c9d8eb}
+.panel{display:none}.panel.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:#0e1117;border:1px solid #1e2a3a;border-radius:12px;padding:14px;text-align:center}
+.stat-val{font-size:26px;font-weight:700;color:#c9d8eb}
+.stat-val.g{color:#4ade80}.stat-val.b{color:#60a5fa}.stat-val.y{color:#fbbf24}
+.stat-lbl{font-size:9px;color:#4a6fa5;margin-top:3px;text-transform:uppercase;letter-spacing:.08em}
+.card{background:#0e1117;border:1px solid #1e2a3a;border-radius:12px;padding:18px;margin-bottom:14px}
+.card-title{font-size:11px;color:#4a6fa5;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:14px}
+.field{margin-bottom:12px}
+.lbl{font-size:10px;color:#4a6fa5;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;display:block;font-weight:600}
+input,select{width:100%;background:#070c14;border:1px solid #1e2d42;border-radius:8px;padding:9px 12px;color:#c9d8eb;font-size:13px;outline:none;transition:border .2s}
 input:focus,select:focus{border-color:#1a6ff5}
-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a6fa5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;background-color:#070c14}
+input::placeholder{color:#1e3050}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a6fa5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:#070c14}
 select option{background:#0e1117}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
-.stat{background:#070c14;border:1px solid #1e2d42;border-radius:10px;padding:10px 8px;text-align:center}
-.stat-val{font-size:22px;font-weight:700;color:#c9d8eb}
-.stat-val.g{color:#4ade80}.stat-val.r{color:#f87171}
-.stat-lbl{font-size:9px;color:#4a6fa5;margin-top:2px;text-transform:uppercase}
-.prog-row{display:flex;justify-content:space-between;font-size:11px;color:#2a4a6a;margin-bottom:5px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.s-box{background:#070c14;border:1px solid #1e2d42;border-radius:8px;padding:8px;text-align:center}
+.s-val{font-size:20px;font-weight:700;color:#c9d8eb}
+.s-val.g{color:#4ade80}.s-val.r{color:#f87171}
+.s-lbl{font-size:9px;color:#4a6fa5;text-transform:uppercase}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:#2a4a6a;margin-bottom:4px}
 .prog-bg{background:#070c14;border-radius:4px;height:6px;border:1px solid #1e2d42;margin-bottom:10px;overflow:hidden}
 .prog-fill{height:100%;background:#1a6ff5;border-radius:4px;transition:width .5s;width:0%}
-.status-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.status-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .sdot{width:8px;height:8px;border-radius:50%;background:#2a3a4a;flex-shrink:0}
 .sdot.run{background:#4ade80;animation:blink 1s infinite}
 .sdot.done{background:#4ade80}.sdot.stop{background:#ef4444}
-.status-txt{font-size:12px;color:#4a6fa5}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.btn-go{background:#1a6ff5;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
-.btn-go:hover{background:#1558cc}
-.btn-go:disabled{opacity:.35;cursor:not-allowed}
-.btn-stop{background:transparent;color:#ef4444;border:1.5px solid #ef4444;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer}
-.btn-stop:disabled{opacity:.25;cursor:not-allowed}
-.log-hdr{font-size:10px;color:#2a4a6a;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:5px}
-.log-box{background:#050810;border:1px solid #111d2e;border-radius:10px;padding:10px 12px;height:150px;overflow-y:auto;font-family:monospace;font-size:11px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.btn-blue{background:#1a6ff5;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-blue:disabled{opacity:.35;cursor:not-allowed}
+.btn-red{background:transparent;color:#ef4444;border:1.5px solid #ef4444;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-red:disabled{opacity:.25;cursor:not-allowed}
+.log-box{background:#050810;border:1px solid #111d2e;border-radius:8px;padding:10px 12px;height:130px;overflow-y:auto;font-family:monospace;font-size:11px}
 .log-box::-webkit-scrollbar{width:3px}
 .log-box::-webkit-scrollbar-thumb{background:#1e2d42;border-radius:2px}
 .lg{margin-bottom:3px;line-height:1.6}
 .ok{color:#4ade80}.err{color:#f87171}.inf{color:#60a5fa}.mut{color:#1e3050}
-.fund-alert{display:none;background:#1a0a08;border:1px solid #7f1d1d;border-radius:10px;padding:12px 14px;margin-bottom:14px;color:#fca5a5;font-size:12px;align-items:center;gap:8px}
-.fund-alert svg{width:16px;height:16px;flex-shrink:0;fill:#ef4444}
+.fund-alert{display:none;background:#1a0a08;border:1px solid #7f1d1d;border-radius:8px;padding:10px 14px;margin-bottom:12px;color:#fca5a5;font-size:12px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:#070c14;color:#4a6fa5;padding:8px 10px;text-align:left;font-weight:600;border-bottom:1px solid #1e2d42;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #070c14;color:#c9d8eb;white-space:nowrap}
+tr:hover td{background:#070c14}
+.b-ok{background:#14532d;color:#4ade80;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600}
+.b-pending{background:#1c1917;color:#fbbf24;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600}
+.b-progress{background:#1e3a5c;color:#60a5fa;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600}
+.b-fail{background:#450a0a;color:#f87171;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600}
+.btn-refresh{background:#0d1f35;border:1px solid #1a6ff5;color:#60a5fa;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-weight:600}
 </style>
 </head>
 <body>
@@ -60,213 +77,226 @@ select option{background:#0e1117}
     <div class="topbar-title">⚡ AdWord Auto Order Tool</div>
     <div class="topbar-sub">v3.0 — <span id="uname">...</span></div>
   </div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
-    <div class="badge"><span class="dot-live"></span>LIVE</div>
-    <div class="bal-badge">💰 $<span id="bal">0.00</span></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="live-badge"><span class="dot-live"></span>LIVE</div>
+    <div class="bal-badge">SMM $<span id="smm-bal">—</span></div>
     <button class="btn-logout" onclick="doLogout()">Logout</button>
   </div>
 </div>
 
 <div class="main">
-<div class="card">
-<div class="body">
-
-  <div class="fund-alert" id="fund-alert">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-    <span>Insufficient balance! Please contact admin to add funds.</span>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val b" id="st-total-orders">0</div><div class="stat-lbl">Total Orders</div></div>
+    <div class="stat-card"><div class="stat-val g" id="st-total-views">0</div><div class="stat-lbl">Total Views</div></div>
+    <div class="stat-card"><div class="stat-val y" id="st-month-views">0</div><div class="stat-lbl">This Month Views</div></div>
+    <div class="stat-card"><div class="stat-val" id="st-success">0</div><div class="stat-lbl">Successful Orders</div></div>
+    <div class="stat-card"><div class="stat-val y" id="st-month-orders">0</div><div class="stat-lbl">This Month Orders</div></div>
+    <div class="stat-card"><div class="stat-val g" id="st-smm">$—</div><div class="stat-lbl">SMM Balance</div></div>
   </div>
 
-  <div class="field">
-    <span class="lbl">Service</span>
-    <select id="service-id">
-      <option value="1554">🔥 #1554 — SV4 FB Live Stream Views | 90 Min</option>
-      <option value="1236">⚡ #1236 — FB Live Stream Views | 90 Min | Instant Start</option>
-    </select>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('order',this)">▶ Place Order</div>
+    <div class="tab" onclick="showTab('history',this)">📦 Order History</div>
   </div>
 
-  <div class="field">
-    <span class="lbl">Facebook Live Stream Link</span>
-    <input id="link" type="url" placeholder="https://www.facebook.com/your-live-url"/>
-  </div>
-
-  <div class="row2">
-    <div class="field">
-      <span class="lbl">Quantity per Order</span>
-      <input id="qty" type="number" value="100" min="20" max="5000"/>
+  <!-- Place Order -->
+  <div class="panel active" id="tab-order">
+    <div class="card">
+      <div class="card-title">New Order Session</div>
+      <div class="fund-alert" id="fund-alert">⚠️ Insufficient balance! Contact admin to add funds.</div>
+      <div class="field">
+        <span class="lbl">Service</span>
+        <select id="service-id">
+          <option value="1554">🔥 #1554 — SV4 FB Live Stream Views | 90 Min</option>
+          <option value="1236">⚡ #1236 — FB Live Stream Views | 90 Min | Instant Start</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="lbl">Facebook Live Stream Link</span>
+        <input id="link" type="url" placeholder="https://www.facebook.com/your-live-url"/>
+      </div>
+      <div class="row2">
+        <div class="field"><span class="lbl">Quantity per Order</span><input id="qty" type="number" value="100" min="20" max="5000"/></div>
+        <div class="field"><span class="lbl">Total Orders</span><input id="total" type="number" value="5" min="1"/></div>
+      </div>
+      <div class="field"><span class="lbl">Gap Between Orders (Minutes)</span><input id="gap" type="number" value="1" min="1"/></div>
+      <div class="stats-row">
+        <div class="s-box"><div class="s-val" id="s-placed">0</div><div class="s-lbl">Placed</div></div>
+        <div class="s-box"><div class="s-val g" id="s-ok">0</div><div class="s-lbl">Success</div></div>
+        <div class="s-box"><div class="s-val r" id="s-fail">0</div><div class="s-lbl">Failed</div></div>
+      </div>
+      <div class="prog-row"><span id="prog-txt">0 / 0 orders</span><span id="prog-pct">0%</span></div>
+      <div class="prog-bg"><div class="prog-fill" id="prog"></div></div>
+      <div class="status-row">
+        <div class="sdot" id="sdot"></div>
+        <span style="font-size:12px;color:#4a6fa5" id="status">Idle — ready to start</span>
+      </div>
+      <div class="btns">
+        <button class="btn-blue" id="btn-s" onclick="startSession()">▶ Start</button>
+        <button class="btn-red" id="btn-x" onclick="stopSession()" disabled>■ Stop</button>
+      </div>
+      <div class="lbl" style="margin-bottom:5px">Order Log</div>
+      <div class="log-box" id="log"><div class="lg inf">System ready. Configure and press Start.</div></div>
     </div>
-    <div class="field">
-      <span class="lbl">Total Orders</span>
-      <input id="total" type="number" value="5" min="1"/>
+  </div>
+
+  <!-- Order History -->
+  <div class="panel" id="tab-history">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:0">Order History</div>
+        <button class="btn-refresh" onclick="refreshStatuses(this)">🔄 Refresh Status</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Date</th><th>Service</th><th>Link</th><th>Qty</th><th>Order Status</th><th>SMM Status</th><th>SMM ID</th></tr>
+          </thead>
+          <tbody id="orders-body">
+            <tr><td colspan="8" style="text-align:center;color:#2a4a6a;padding:20px">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-
-  <div class="field">
-    <span class="lbl">Gap Between Orders (Minutes)</span>
-    <input id="gap" type="number" value="1" min="1"/>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="stat-val" id="s-placed">0</div><div class="stat-lbl">Placed</div></div>
-    <div class="stat"><div class="stat-val g" id="s-ok">0</div><div class="stat-lbl">Success</div></div>
-    <div class="stat"><div class="stat-val r" id="s-fail">0</div><div class="stat-lbl">Failed</div></div>
-  </div>
-
-  <div class="prog-row">
-    <span id="prog-txt">0 / 0 orders</span>
-    <span id="prog-pct">0%</span>
-  </div>
-  <div class="prog-bg"><div class="prog-fill" id="prog"></div></div>
-
-  <div class="status-row">
-    <div class="sdot" id="sdot"></div>
-    <span class="status-txt" id="status">Idle — ready to start</span>
-  </div>
-
-  <div class="btns">
-    <button class="btn-go" id="btn-s" onclick="startSession()">▶ Start</button>
-    <button class="btn-stop" id="btn-x" onclick="stopSession()" disabled>■ Stop</button>
-  </div>
-
-  <div class="log-hdr">Order Log</div>
-  <div class="log-box" id="log">
-    <div class="lg inf">System ready. Configure and press Start.</div>
-  </div>
-
-</div>
-</div>
 </div>
 
 <script>
-let currentSid = null;
-let pollTimer  = null;
-let lastOrderCount = 0;
+let currentSid=null, pollTimer=null, lastOrderCount=0;
 
 async function loadMe(){
-  const r = await fetch('/me');
-  if(r.status === 401){ window.location.href='/'; return; }
-  const d = await r.json();
-  document.getElementById('uname').textContent = d.username;
-  document.getElementById('bal').textContent   = parseFloat(d.balance).toFixed(4);
+  const r=await fetch('/me');
+  if(r.status===401){window.location.href='/';return;}
+  const d=await r.json();
+  document.getElementById('uname').textContent=d.username;
+  const smm=d.smm_balance?'$'+parseFloat(d.smm_balance).toFixed(2):'—';
+  document.getElementById('smm-bal').textContent=smm;
+  document.getElementById('st-smm').textContent=smm;
 }
 
-function ts(){ return new Date().toTimeString().slice(0,8) }
-function log(m, c='mut'){
-  const b = document.getElementById('log');
-  b.innerHTML += `<div class="lg ${c}">[${ts()}] ${m}</div>`;
-  b.scrollTop = b.scrollHeight;
+async function loadStats(){
+  const r=await fetch('/user/stats');
+  const d=await r.json();
+  document.getElementById('st-total-orders').textContent=d.total_orders;
+  document.getElementById('st-total-views').textContent=d.total_views.toLocaleString();
+  document.getElementById('st-month-views').textContent=d.month_views.toLocaleString();
+  document.getElementById('st-success').textContent=d.success_orders;
+  document.getElementById('st-month-orders').textContent=d.month_orders;
 }
-function setDot(c){ document.getElementById('sdot').className='sdot '+c }
-function setStatus(t){ document.getElementById('status').textContent = t }
+
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='history')loadOrderHistory();
+}
+
+async function loadOrderHistory(){
+  const r=await fetch('/user/my-orders');
+  const orders=await r.json();
+  const svc={'1554':'SV4|90Min','1236':'Instant|90Min'};
+  document.getElementById('orders-body').innerHTML=orders.length===0
+    ?'<tr><td colspan="8" style="text-align:center;color:#2a4a6a;padding:20px">Koi orders nahi hain.</td></tr>'
+    :orders.map((o,i)=>{
+      const ss=o.smm_status||'pending';
+      const sb=ss==='completed'?'<span class="b-ok">✅ Completed</span>'
+        :ss==='inprogress'||ss==='in progress'||ss==='processing'?'<span class="b-progress">🔄 In Progress</span>'
+        :ss==='partial'?'<span class="b-pending">⚡ Partial</span>'
+        :ss==='cancelled'?'<span class="b-fail">❌ Cancelled</span>'
+        :'<span class="b-pending">⏳ Pending</span>';
+      const ob=o.status==='success'?'<span class="b-ok">✅ Placed</span>'
+        :o.status==='balance_low'?'<span class="b-fail">💸 Low Bal</span>'
+        :'<span class="b-fail">❌ Failed</span>';
+      const sl=o.link.length>28?o.link.slice(0,28)+'...':o.link;
+      return `<tr><td>${i+1}</td><td>${o.created_at.slice(0,16)}</td><td>#${o.service_id} ${svc[o.service_id]||''}</td><td title="${o.link}">${sl}</td><td>${o.quantity}</td><td>${ob}</td><td>${sb}</td><td><code style="color:#60a5fa;font-size:10px">${o.smm_order_id||'—'}</code></td></tr>`;
+    }).join('');
+}
+
+async function refreshStatuses(btn){
+  btn.textContent='⏳ Refreshing...';btn.disabled=true;
+  await fetch('/refresh-order-statuses',{method:'POST'});
+  await loadOrderHistory();await loadStats();
+  btn.textContent='🔄 Refresh Status';btn.disabled=false;
+}
+
+function ts(){return new Date().toTimeString().slice(0,8)}
+function log(m,c='mut'){const b=document.getElementById('log');b.innerHTML+=`<div class="lg ${c}">[${ts()}] ${m}</div>`;b.scrollTop=b.scrollHeight;}
+function setDot(c){document.getElementById('sdot').className='sdot '+c}
+function setStatus(t){document.getElementById('status').textContent=t}
 
 async function startSession(){
-  const link  = document.getElementById('link').value.trim();
-  const qty   = parseInt(document.getElementById('qty').value)||0;
-  const total = parseInt(document.getElementById('total').value)||0;
-  const gap   = parseInt(document.getElementById('gap').value)||0;
-  const svc   = document.getElementById('service-id').value;
-
-  if(!link || !link.includes('facebook.com')){ alert('Valid Facebook Live link daalo!'); return }
-  if(qty<20||qty>5000){ alert('Quantity 20-5000 honi chahiye!'); return }
-  if(total<1){ alert('Total orders kam se kam 1!'); return }
-  if(gap<1){ alert('Gap kam se kam 1 minute!'); return }
-
+  const link=document.getElementById('link').value.trim();
+  const qty=parseInt(document.getElementById('qty').value)||0;
+  const total=parseInt(document.getElementById('total').value)||0;
+  const gap=parseInt(document.getElementById('gap').value)||0;
+  const svc=document.getElementById('service-id').value;
+  if(!link||!link.includes('facebook.com')){alert('Valid Facebook Live link daalo!');return}
+  if(qty<20||qty>5000){alert('Quantity 20-5000!');return}
+  if(total<1){alert('Total orders kam se kam 1!');return}
+  if(gap<1){alert('Gap kam se kam 1 min!');return}
   document.getElementById('fund-alert').style.display='none';
   document.getElementById('btn-s').disabled=true;
   document.getElementById('btn-x').disabled=false;
-  lastOrderCount = 0;
-  setDot('run');
-  setStatus('Starting session...');
-  log(`Session shuru | Service: #${svc} | Orders: ${total} | Qty: ${qty} | Gap: ${gap}min`, 'inf');
-
-  const r = await fetch('/start-session', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({link, service_id:svc, quantity:qty, total_orders:total, gap_minutes:gap})
-  });
-  const d = await r.json();
+  lastOrderCount=0;setDot('run');setStatus('Starting...');
+  log(`Session shuru | #${svc} | Orders:${total} | Qty:${qty} | Gap:${gap}min`,'inf');
+  const r=await fetch('/start-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({link,service_id:svc,quantity:qty,total_orders:total,gap_minutes:gap})});
+  const d=await r.json();
   if(d.success){
-    currentSid = d.session_id;
-    log(`Session ID: ${currentSid.slice(0,8)}...`, 'inf');
-    startPolling();
+    currentSid=d.session_id;
+    log(`Session: ${currentSid.slice(0,8)}...`,'inf');
+    pollTimer=setInterval(pollStatus,3000);
   } else {
-    log(`Error: ${d.error}`, 'err');
+    log('Error: '+d.error,'err');
     document.getElementById('btn-s').disabled=false;
     document.getElementById('btn-x').disabled=true;
-    setDot('stop');
-    setStatus('Error — try again');
+    setDot('stop');setStatus('Error — try again');
   }
-}
-
-function startPolling(){
-  if(pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(pollStatus, 3000);
 }
 
 async function pollStatus(){
-  if(!currentSid) return;
-  const r = await fetch(`/session-status/${currentSid}`);
-  const d = await r.json();
-  if(d.error) return;
-
-  // Update stats
-  document.getElementById('s-placed').textContent = d.placed;
-  document.getElementById('s-ok').textContent     = d.success;
-  document.getElementById('s-fail').textContent   = d.failed;
-  const pct = d.total>0 ? Math.round(d.placed/d.total*100) : 0;
-  document.getElementById('prog').style.width     = pct+'%';
-  document.getElementById('prog-txt').textContent = `${d.placed} / ${d.total} orders`;
-  document.getElementById('prog-pct').textContent = pct+'%';
-
-  // New orders in log
-  if(d.orders && d.orders.length > 0){
-    const newOrders = d.orders.filter(o => o.order_num > lastOrderCount);
-    newOrders.reverse().forEach(o => {
-      if(o.status === 'success'){
-        log(`Order #${o.order_num} — ID: ${o.smm_order_id} ✓`, 'ok');
-      } else if(o.status === 'balance_low'){
-        log(`Order #${o.order_num} — Insufficient Balance!`, 'err');
-        document.getElementById('fund-alert').style.display='flex';
-      } else {
-        log(`Order #${o.order_num} — Failed: ${o.smm_order_id}`, 'err');
-      }
-      lastOrderCount = Math.max(lastOrderCount, o.order_num);
+  if(!currentSid)return;
+  const r=await fetch(`/session-status/${currentSid}`);
+  const d=await r.json();
+  if(d.error)return;
+  document.getElementById('s-placed').textContent=d.placed;
+  document.getElementById('s-ok').textContent=d.success;
+  document.getElementById('s-fail').textContent=d.failed;
+  const pct=d.total>0?Math.round(d.placed/d.total*100):0;
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-txt').textContent=`${d.placed} / ${d.total} orders`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  if(d.orders){
+    d.orders.filter(o=>o.order_num>lastOrderCount).reverse().forEach(o=>{
+      if(o.status==='success')log(`Order #${o.order_num} — ID: ${o.smm_order_id} ✓`,'ok');
+      else if(o.status==='balance_low'){log(`Order #${o.order_num} — Low Balance!`,'err');document.getElementById('fund-alert').style.display='block';}
+      else log(`Order #${o.order_num} — Failed`,'err');
+      lastOrderCount=Math.max(lastOrderCount,o.order_num);
     });
   }
-
-  // Check if done
-  if(d.status === 'completed'){
-    clearInterval(pollTimer);
-    setDot('done');
-    setStatus('✅ Session complete!');
-    log(`Session complete! ${d.success} of ${d.total} orders successful.`, 'ok');
-    document.getElementById('btn-s').disabled=false;
-    document.getElementById('btn-x').disabled=true;
-    loadMe();
-  } else if(d.status === 'stopped'){
-    clearInterval(pollTimer);
-    setDot('stop');
-    setStatus('⏹ Session stopped.');
-    log(`Session stopped. ${d.success} orders successful.`, 'inf');
-    document.getElementById('btn-s').disabled=false;
-    document.getElementById('btn-x').disabled=true;
+  if(d.status==='completed'){
+    clearInterval(pollTimer);setDot('done');setStatus('✅ Complete!');
+    log(`Complete! ${d.success}/${d.total} successful.`,'ok');
+    document.getElementById('btn-s').disabled=false;document.getElementById('btn-x').disabled=true;
+    loadStats();loadMe();
+  } else if(d.status==='stopped'){
+    clearInterval(pollTimer);setDot('stop');setStatus('⏹ Stopped.');
+    log(`Stopped. ${d.success} orders successful.`,'inf');
+    document.getElementById('btn-s').disabled=false;document.getElementById('btn-x').disabled=true;
   } else {
-    setStatus(`🟢 Running — ${d.placed}/${d.total} orders placed...`);
+    setStatus(`🟢 Running — ${d.placed}/${d.total} orders...`);
   }
 }
 
 async function stopSession(){
-  if(!currentSid) return;
-  await fetch(`/stop-session/${currentSid}`, {method:'POST'});
-  log('Stop signal bheja gaya...', 'mut');
-  setStatus('⏹ Stopping...');
+  if(!currentSid)return;
+  await fetch(`/stop-session/${currentSid}`,{method:'POST'});
+  log('Stop signal bheja...','mut');
 }
 
-async function doLogout(){
-  await fetch('/logout', {method:'POST'});
-  window.location.href='/';
-}
+async function doLogout(){await fetch('/logout',{method:'POST'});window.location.href='/';}
 
-loadMe();
+loadMe();loadStats();
 </script>
 </body>
 </html>
