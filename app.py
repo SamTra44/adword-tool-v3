@@ -47,6 +47,7 @@ def init_db():
             quantity INTEGER NOT NULL,
             status TEXT NOT NULL,
             smm_order_id TEXT,
+            smm_status TEXT DEFAULT 'pending',
             cost_usd REAL DEFAULT 0,
             created_at TEXT NOT NULL,
             username TEXT NOT NULL
@@ -350,6 +351,15 @@ def balance_history():
             ORDER BY created_at DESC""").fetchall()
     return jsonify([dict(l) for l in logs])
 
+
+@app.route("/admin/delete-balance/<int:log_id>", methods=["DELETE"])
+@login_required
+@admin_required
+def delete_balance(log_id):
+    with get_db() as db:
+        db.execute("DELETE FROM balance_logs WHERE id=?", (log_id,))
+        db.commit()
+    return jsonify({"success": True, "new_balance": get_balance()})
 @app.route("/admin/all-orders")
 @login_required
 @admin_required
@@ -460,3 +470,73 @@ def admin_stats():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+# ── USER ROUTES ───────────────────────────────────────────
+@app.route("/user/my-orders")
+@login_required
+def my_orders():
+    with get_db() as db:
+        rows = db.execute("""SELECT * FROM orders WHERE username=?
+            ORDER BY created_at DESC LIMIT 200""",
+            (session["username"],)).fetchall()
+    return jsonify([dict(r) for r in rows])
+
+@app.route("/user/stats")
+@login_required
+def user_stats():
+    uname = session["username"]
+    with get_db() as db:
+        total_orders   = db.execute("SELECT COUNT(*) as c FROM orders WHERE username=?", (uname,)).fetchone()["c"]
+        success_orders = db.execute("SELECT COUNT(*) as c FROM orders WHERE username=? AND status='success'", (uname,)).fetchone()["c"]
+        total_views    = db.execute("SELECT COALESCE(SUM(quantity),0) as s FROM orders WHERE username=? AND status='success'", (uname,)).fetchone()["s"]
+        month_orders   = db.execute("""SELECT COUNT(*) as c FROM orders WHERE username=?
+            AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')""", (uname,)).fetchone()["c"]
+        month_views    = db.execute("""SELECT COALESCE(SUM(quantity),0) as s FROM orders WHERE username=?
+            AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now') AND status='success'""", (uname,)).fetchone()["s"]
+    return jsonify({
+        "total_orders":   total_orders,
+        "success_orders": success_orders,
+        "total_views":    int(total_views),
+        "month_orders":   month_orders,
+        "month_views":    int(month_views)
+    })
+
+@app.route("/check-order-status/<smm_order_id>")
+@login_required
+def check_order_status(smm_order_id):
+    try:
+        r = req.post(API_URL, data={
+            "key": API_KEY, "action": "status", "order": smm_order_id
+        }, timeout=10)
+        d = r.json()
+        return jsonify({"success": True, "data": d})
+    except:
+        return jsonify({"success": False})
+
+@app.route("/refresh-order-statuses", methods=["POST"])
+@login_required
+def refresh_order_statuses():
+    """Refresh HonestSSM status for recent successful orders"""
+    uname = session["username"]
+    with get_db() as db:
+        rows = db.execute("""SELECT id, smm_order_id FROM orders
+            WHERE username=? AND status='success' AND smm_order_id IS NOT NULL
+            ORDER BY created_at DESC LIMIT 50""", (uname,)).fetchall()
+
+    updated = 0
+    for row in rows:
+        try:
+            r = req.post(API_URL, data={
+                "key": API_KEY, "action": "status", "order": row["smm_order_id"]
+            }, timeout=8)
+            d = r.json()
+            smm_status = d.get("status","").lower()
+            if smm_status:
+                with get_db() as db:
+                    db.execute("UPDATE orders SET smm_status=? WHERE id=?",
+                               (smm_status, row["id"]))
+                    db.commit()
+                updated += 1
+        except:
+            pass
+    return jsonify({"success": True, "updated": updated})
